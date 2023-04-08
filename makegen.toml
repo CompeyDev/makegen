@@ -1,0 +1,22 @@
+[[windows.build.variables]]
+    TYPE = { required = true, description = "type to compile: release/debug" }
+
+[[windows.build.steps]]
+    log = "Running tests..."
+    command = "cargo test"
+
+[[windows.build.steps]]
+    log = "Compiling binary..."
+    command = "cargo build --target x86_64-pc-windows-gnu --$(TYPE) && mv target/release/config.exe ."
+
+
+[[linux.build.variables]]
+    TYPE = { required = true, description = "type to compile: release/debug" }
+
+[[linux.build.steps]]
+    log = "Running tests..."
+    command = "cargo test"
+
+[[linux.build.steps]]
+    log = "Compiling binary..."
+    command = "cargo build --target x86_64-unknown-linux-gnu --$(TYPE) && mv target/release/config ."
