@@ -1,3 +1,4 @@
+use regex::Regex;
 use serde::Deserialize;
 use std::{fmt::Write, fs};
 use toml::{self, value::Array, Value};
@@ -67,10 +68,10 @@ fn main() {
         match steps_values.get("variables") {
             Some(table) => {
                 construct_variable_checks(table, &mut pre_target_variables_check);
-                construct_steps(steps_values, &mut makefile_contents)
+                construct_steps(steps_values, Some(table), &mut makefile_contents);
             }
             None => {
-                construct_steps(steps_values, &mut makefile_contents);
+                construct_steps(steps_values, None, &mut makefile_contents);
             }
         };
 
@@ -85,7 +86,11 @@ fn main() {
         .expect("failed to write Makefile contents. Aborting.");
 }
 
-fn construct_steps(steps_values: &Value, makefile_contents: &mut String) {
+fn construct_steps(
+    steps_values: &Value,
+    variables_array: Option<&Value>,
+    makefile_contents: &mut String,
+) {
     let steps_iter: Array = steps_values
         .get("steps")
         .expect("expected array `steps`, found `None`")
@@ -105,6 +110,41 @@ fn construct_steps(steps_values: &Value, makefile_contents: &mut String) {
                 .as_str()
                 .unwrap()
         );
+
+        match variables_array {
+            Some(array) => {
+                // including brackets: \([a-z-A-Z-1-9_]*\)
+                let pat =
+                    Regex::new(r"\((.*?)\)").expect("failed to construct step variable matcher");
+
+                let matches: Vec<String> = pat
+                    .find_iter(formatted.as_str())
+                    .filter_map(|any| any.as_str().parse().ok())
+                    .collect();
+
+                for instance in matches {
+                    // we need to trim the bounding brackets
+                    let mut var_usage_instance_chars = instance.chars();
+                    var_usage_instance_chars.next();
+                    var_usage_instance_chars.next_back();
+
+                    let var_usage_instance = var_usage_instance_chars.as_str();
+
+                    let available_vars = array
+                        .as_array()
+                        .expect("expected type `Array` for `variables`")[0]
+                        .as_table()
+                        .expect("expected type `Table` for variables list");
+
+                    let var_is_predefined = available_vars.contains_key(var_usage_instance);
+
+                    if !var_is_predefined {
+                        panic!("variable {} used before definition!", var_usage_instance);
+                    }
+                }
+            }
+            None => (),
+        }
 
         write!(makefile_contents, "{}\n", formatted).expect("real");
     }

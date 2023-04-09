@@ -7,7 +7,7 @@
 
 [[windows.build.steps]]
     log = "Compiling binary..."
-    command = "cargo build --target x86_64-pc-windows-gnu --$(TYPE) && mv target/release/config.exe ."
+    command = "cargo build --target x86_64-pc-windows-gnu --$(TYPE) && mv target/x86_64-pc-windows-gnu/release/config.exe ."
 
 
 [[linux.build.variables]]
@@ -19,4 +19,4 @@
 
 [[linux.build.steps]]
     log = "Compiling binary..."
-    command = "cargo build --target x86_64-unknown-linux-gnu --$(TYPE) && mv target/release/config ."
+    command = "cargo build --target x86_64-unknown-linux-gnu --$(TYPE) && mv target/x86_64-unknown-linux-gnu/release/config ."

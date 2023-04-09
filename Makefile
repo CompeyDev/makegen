@@ -13,7 +13,8 @@ $(if $(value $1),, \
 log_prefix := \x1b[34m[\u001b[0m\x1b[31m*\x1b[34m\x1b[34m]\u001b[0m
 command_prefix := \x1b[34m[\u001b[0m\x1b[31m\#\x1b[34m\x1b[34m]\u001b[0m
 
-build:
+
+build:
 	@:$(call check_defined, TYPE, "type to compile: release/debug")
 
 	@echo -e "${log_prefix} "Running tests...""
