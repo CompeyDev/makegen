@@ -113,7 +113,7 @@ fn construct_steps(
 
         match variables_array {
             Some(array) => {
-                // including brackets: \([a-z-A-Z-1-9_]*\)
+                // match of this pattern would include the brackets
                 let pat =
                     Regex::new(r"\((.*?)\)").expect("failed to construct step variable matcher");
 
