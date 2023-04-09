@@ -13,3 +13,12 @@ $(if $(value $1),, \
 log_prefix := \x1b[34m[\u001b[0m\x1b[31m*\x1b[34m\x1b[34m]\u001b[0m
 command_prefix := \x1b[34m[\u001b[0m\x1b[31m\#\x1b[34m\x1b[34m]\u001b[0m
 
+build:
+	@:$(call check_defined, TYPE, "type to compile: release/debug")
+
+	@echo -e "${log_prefix} "Running tests...""
+	@echo -e "${command_prefix} "cargo test""
+	@cargo test
+	@echo -e "${log_prefix} "Compiling binary...""
+	@echo -e "${command_prefix} "cargo build --target x86_64-pc-windows-gnu --$(TYPE) && mv target/release/config.exe .""
+	@cargo build --target x86_64-pc-windows-gnu --$(TYPE) && mv target/release/config.exe .
